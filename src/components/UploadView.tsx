@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 type UploadViewProps = {
   message: string;
@@ -15,12 +15,7 @@ export function UploadView({
 }: UploadViewProps) {
   return (
     <main className="page-shell">
-      <Link className="brand" href="/" aria-label="BizzSimp home">
-        <span className="brand-mark" aria-hidden="true">
-          b
-        </span>
-        BizzSimp
-      </Link>
+      <Logo />
 
       <section className="intro" aria-labelledby="page-title">
         <p className="eyebrow">A clearer view of your sales</p>
@@ -31,7 +26,11 @@ export function UploadView({
         </p>
       </section>
 
-      <section className="upload-panel" aria-label="Upload sales data">
+      <section
+        className="upload-panel"
+        aria-label="Upload sales data"
+        aria-busy={isProcessing}
+      >
         <label className="drop-area" htmlFor="sales-file">
           <input
             id="sales-file"
@@ -54,6 +53,11 @@ export function UploadView({
             <span className="drop-help">Use a file from your device</span>
           </span>
         </label>
+        {isProcessing && (
+          <p className="sr-only" role="status" aria-live="polite">
+            Reading your sales CSV in this browser.
+          </p>
+        )}
 
         <button
           className="button-secondary"
