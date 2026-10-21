@@ -83,6 +83,20 @@ function NextStepIcon() {
   );
 }
 
+function formatRowNumbers(rowNumbers: number[]) {
+  const visibleRows = rowNumbers.slice(0, 10);
+  const lastVisibleRow = visibleRows.pop();
+  const remainingRows = rowNumbers.length - 10;
+  const listedRows =
+    remainingRows > 0
+      ? [...visibleRows, lastVisibleRow].join(", ")
+      : visibleRows.length > 0
+        ? `${visibleRows.join(", ")} and ${lastVisibleRow}`
+        : String(lastVisibleRow);
+
+  return `${listedRows}${remainingRows > 0 ? ` and ${remainingRows} more` : ""}`;
+}
+
 export function SummaryView({
   analysis,
   copy,
@@ -121,10 +135,15 @@ export function SummaryView({
           )}
           {skippedRows.length > 0 && (
             <p className="notice">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 11v5m0-8h.01" />
+              </svg>
               We skipped {skippedRows.length} row
-              {skippedRows.length === 1 ? "" : "s"} we couldn’t read (row
+              {skippedRows.length === 1 ? " because" : "s because"} we
+              couldn’t read {skippedRows.length === 1 ? "it" : "them"} (row
               {skippedRows.length === 1 ? "" : "s"}{" "}
-              {skippedRows.join(", ")}).
+              {formatRowNumbers(skippedRows)}).
             </p>
           )}
         </div>

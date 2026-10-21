@@ -12,6 +12,8 @@ export type SaleRow = {
 export type ParseSalesCsvResult =
   | { kind: "success"; rows: SaleRow[]; skippedRowNumbers: number[] }
   | { kind: "missing-headers"; missingHeaders: string[] }
+  | { kind: "empty-file" }
+  | { kind: "parse-error" }
   | { kind: "no-usable-rows"; skippedRowNumbers: number[] };
 
 function isValidDate(value: string): boolean {
@@ -33,11 +35,23 @@ function parseNonNegativeNumber(value: string | undefined): number | null {
 }
 
 export function parseSalesCsv(csvText: string): ParseSalesCsvResult {
-  const result = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: false,
-    transformHeader: (header) => header.trim().toLowerCase(),
-  });
+  if (csvText.trim() === "") return { kind: "empty-file" };
+
+  let result: Papa.ParseResult<Record<string, string>>;
+  try {
+    result = Papa.parse<Record<string, string>>(csvText, {
+      header: true,
+      skipEmptyLines: false,
+      transformHeader: (header) => header.trim().toLowerCase(),
+    });
+  } catch {
+    return { kind: "parse-error" };
+  }
+
+  if (result.errors.some((error) => error.type !== "FieldMismatch")) {
+    return { kind: "parse-error" };
+  }
+
   const headers = result.meta.fields ?? [];
   const missingHeaders = REQUIRED_HEADERS.filter(
     (header) => !headers.includes(header),

@@ -36,6 +36,7 @@ describe("analyzeSales", () => {
     const copy = writeSalesCopy(result);
     expect(copy.headline).toContain("34%");
     expect(copy.headline).toContain("Ankara dress");
+    expect(copy.suggestion).toContain("Ankara dress");
     expect(copy.slowing).toEqual([
       "Silk scarf: ₦40,000 in August, no sales in September.",
       "Belts: ₦30,000 in August, ₦12,000 in September.",
@@ -140,7 +141,15 @@ describe("analyzeSales", () => {
     expect(result.kind).toBe("success");
     if (result.kind !== "success") return;
     expect(result.percentageChange).toBeNull();
-    expect(writeSalesCopy(result).headline).toContain("no percentage change");
+    const copy = writeSalesCopy(result);
+    expect(copy.headline).toBe(
+      "You earned ₦200 in September 2026. August 2026 had no sales to compare with, so there's no percentage change to show.",
+    );
+    expect(copy.selling).toEqual(["Dress: ₦200 from 2 units."]);
+    expect(copy.slowing).toEqual([
+      "There is nothing to compare against because August 2026 had no sales.",
+    ]);
+    expect(copy.suggestion).toContain("Consider featuring Dress");
   });
 
   it("names both months when revenue falls but sales continue", () => {
@@ -174,6 +183,26 @@ describe("analyzeSales", () => {
     expect(writeSalesCopy(result).headline).not.toContain("making the biggest difference");
   });
 
+  it("attributes an item whose increase is exactly one third of total growth", () => {
+    const result = analyzeSales(
+      [
+        { date: "2026-08-05", item: "A dress", quantity: 1, price: 100 },
+        { date: "2026-08-05", item: "B bag", quantity: 1, price: 100 },
+        { date: "2026-08-05", item: "C scarf", quantity: 1, price: 100 },
+        { date: "2026-09-05", item: "A dress", quantity: 1, price: 130 },
+        { date: "2026-09-05", item: "B bag", quantity: 1, price: 130 },
+        { date: "2026-09-05", item: "C scarf", quantity: 1, price: 130 },
+      ],
+      referenceDate,
+    );
+
+    expect(result.kind).toBe("success");
+    if (result.kind !== "success") return;
+    expect(writeSalesCopy(result).headline).toContain(
+      "with A dress making the biggest difference",
+    );
+  });
+
   it("uses the steady-sales suggestion when the largest item change is at the 10% threshold", () => {
     const result = analyzeSales(
       [
@@ -187,7 +216,74 @@ describe("analyzeSales", () => {
 
     expect(result.kind).toBe("success");
     if (result.kind !== "success") return;
-    expect(writeSalesCopy(result).suggestion).toContain("Sales look steady");
+    const copy = writeSalesCopy(result);
+    expect(copy.headline).toBe("Sales were steady at ₦1,000 in September 2026.");
+    expect(copy.headline).not.toContain("Dress");
+    expect(copy.suggestion).toContain("Sales look steady");
+  });
+
+  it.each([
+    { latestRevenue: 1100, expected: "Sales were steady at ₦1,100 in September 2026." },
+    { latestRevenue: 900, expected: "Sales were steady at ₦900 in September 2026." },
+  ])(
+    "uses a steady headline at the positive or negative 10% total-revenue boundary",
+    ({ latestRevenue, expected }) => {
+      const result = analyzeSales(
+        [
+          { date: "2026-08-05", item: "Ankara dress", quantity: 10, price: 100 },
+          {
+            date: "2026-09-05",
+            item: "Ankara dress",
+            quantity: latestRevenue / 100,
+            price: 100,
+          },
+        ],
+        referenceDate,
+      );
+
+      expect(result.kind).toBe("success");
+      if (result.kind !== "success") return;
+      expect(writeSalesCopy(result).headline).toBe(expected);
+    },
+  );
+
+  it("lists only item drops greater than 10% of that item's previous revenue", () => {
+    const result = analyzeSales(
+      [
+        { date: "2026-08-05", item: "Stable", quantity: 8, price: 100 },
+        { date: "2026-08-05", item: "Small dip", quantity: 1, price: 100 },
+        { date: "2026-08-05", item: "Exact threshold", quantity: 1, price: 100 },
+        { date: "2026-08-05", item: "Significant", quantity: 1, price: 100 },
+        { date: "2026-08-05", item: "Major", quantity: 2, price: 100 },
+        { date: "2026-09-05", item: "Stable", quantity: 8, price: 100 },
+        { date: "2026-09-05", item: "Small dip", quantity: 0.95, price: 100 },
+        { date: "2026-09-05", item: "Exact threshold", quantity: 0.9, price: 100 },
+        { date: "2026-09-05", item: "Significant", quantity: 0.89, price: 100 },
+        { date: "2026-09-05", item: "Major", quantity: 1.7, price: 100 },
+      ],
+      referenceDate,
+    );
+
+    expect(result.kind).toBe("success");
+    if (result.kind !== "success") return;
+    expect(result.slowingItems.map((item) => item.item)).toEqual([
+      "Major",
+      "Significant",
+    ]);
+
+    const smallDipOnly = analyzeSales(
+      [
+        { date: "2026-08-05", item: "Small dip", quantity: 1, price: 100 },
+        { date: "2026-09-05", item: "Small dip", quantity: 0.95, price: 100 },
+      ],
+      referenceDate,
+    );
+
+    expect(smallDipOnly.kind).toBe("success");
+    if (smallDipOnly.kind !== "success") return;
+    expect(writeSalesCopy(smallDipOnly).slowing).toEqual([
+      "No items had a revenue drop greater than 10% of their previous month's revenue.",
+    ]);
   });
 
   it("breaks equal-magnitude suggestion ties using latest-month revenue", () => {

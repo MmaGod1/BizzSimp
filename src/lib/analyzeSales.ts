@@ -141,7 +141,9 @@ export function analyzeSales(
     itemComparisons,
     topItems: itemComparisons.filter((item) => item.latestRevenue > 0).slice(0, 3),
     slowingItems: itemComparisons
-      .filter((item) => item.latestRevenue < item.previousRevenue)
+      .filter(
+        (item) => item.change < -item.previousRevenue * 0.1,
+      )
       .sort(
         (a, b) =>
           b.previousRevenue -

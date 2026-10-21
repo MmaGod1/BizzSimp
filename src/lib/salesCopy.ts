@@ -20,6 +20,10 @@ function money(value: number): string {
   return naira.format(value);
 }
 
+function monthName(label: string): string {
+  return label.replace(/\s+\d{4}$/, "");
+}
+
 function biggestMover(items: ItemComparison[]): ItemComparison | undefined {
   return [...items].sort(
     (a, b) =>
@@ -34,7 +38,11 @@ export function writeSalesCopy(analysis: SalesAnalysisSuccess): SalesCopy {
   let headline: string;
 
   if (previousMonth.revenue === 0) {
-    headline = `${latestMonth.label} brought in ${money(latestMonth.revenue)}. There’s no percentage change to show because the previous month had no sales revenue.`;
+    headline = `You earned ${money(latestMonth.revenue)} in ${latestMonth.label}. ${previousMonth.label} had no sales to compare with, so there's no percentage change to show.`;
+  } else if (
+    Math.abs(revenueChange) <= previousMonth.revenue * 0.1
+  ) {
+    headline = `Sales were steady at ${money(latestMonth.revenue)} in ${latestMonth.label}.`;
   } else if (revenueChange > 0) {
     const percentage = Math.round(analysis.percentageChange ?? 0);
     const leadingIncrease = [...analysis.itemComparisons]
@@ -60,13 +68,18 @@ export function writeSalesCopy(analysis: SalesAnalysisSuccess): SalesCopy {
       : ["No items brought in sales in the latest month."];
   const slowing =
     previousMonth.revenue === 0
-      ? ["There is no previous-month revenue to compare against yet."]
+      ? [`There is nothing to compare against because ${previousMonth.label} had no sales.`]
       : analysis.slowingItems.length > 0
-        ? analysis.slowingItems.map(
-            (item) =>
-              `${item.item}: ${money(item.previousRevenue)} before, ${money(item.latestRevenue)} now.`,
-          )
-        : ["No items earned less than they did in the previous month."];
+        ? analysis.slowingItems.map((item) => {
+            const latestResult =
+              item.latestUnits === 0
+                ? `no sales in ${monthName(latestMonth.label)}`
+                : `${money(item.latestRevenue)} in ${monthName(latestMonth.label)}`;
+            return `${item.item}: ${money(item.previousRevenue)} in ${monthName(previousMonth.label)}, ${latestResult}.`;
+          })
+        : [
+            "No items had a revenue drop greater than 10% of their previous month's revenue.",
+          ];
 
   let suggestion: string;
   if (previousMonth.revenue === 0) {

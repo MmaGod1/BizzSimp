@@ -110,7 +110,7 @@ a:focus-visible {
 .eyebrow {
   margin: 0 0 0.65rem;
   color: var(--accent);
-  font-size: 0.84rem;
+  font-size: 1rem;
   font-weight: 750;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -204,7 +204,7 @@ h1 {
 .drop-help {
   margin: 0;
   color: var(--muted-text);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .button {
@@ -234,6 +234,7 @@ h1 {
 
 .button-secondary {
   display: block;
+  min-height: 44px;
   margin: 1rem auto 0;
   padding: 0.55rem 0.8rem;
   border: 0;
@@ -253,7 +254,7 @@ h1 {
   padding-top: 1.35rem;
   border-top: 1px solid var(--border);
   color: var(--card-muted);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .format-note strong {
@@ -266,22 +267,38 @@ h1 {
   overflow-wrap: anywhere;
   color: var(--card-text);
   font-family: Consolas, "Courier New", monospace;
-  font-size: 0.82rem;
+  font-size: 1rem;
 }
 
 .privacy-note {
   margin: 1.1rem 0 0;
   color: var(--card-muted);
-  font-size: 0.85rem;
+  font-size: 1rem;
   text-align: center;
 }
 
 .message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
   margin: 1rem 0 0;
   padding: 0.85rem 1rem;
+  border-left: 4px solid var(--slowing-accent);
   border-radius: 0.8rem;
   background: var(--slowing-bg);
   color: var(--card-text);
+}
+
+.message svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  margin-top: 0.2rem;
+  fill: none;
+  stroke: var(--slowing-accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .summary-header {
@@ -339,7 +356,7 @@ h1 {
   border-radius: 9999px;
   background: rgb(255 248 240 / 14%);
   color: var(--hero-text);
-  font-size: 0.83rem;
+  font-size: 1rem;
   font-weight: 750;
 }
 
@@ -371,7 +388,7 @@ h1 {
   border-radius: 0.8rem;
   background: var(--surface);
   color: var(--card-text);
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 
 .notice svg {
@@ -439,7 +456,7 @@ h1 {
 
 .result-card p {
   margin-bottom: 0.75rem;
-  font-size: 0.94rem;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -496,7 +513,7 @@ h1 {
 
 .item-units {
   color: var(--card-muted);
-  font-size: 0.86rem;
+  font-size: 1rem;
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {

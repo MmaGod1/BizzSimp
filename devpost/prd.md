@@ -28,7 +28,7 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `sco
 
 ## Look and Feel
 
-Calm and friendly, like a helpful explanation rather than a dashboard. Use a navy (#1E3A5F) page background with warm cream (#FAF8F5) text and muted blue-gray (#B8C4D6) secondary text. Use gold (#F2B84B) accents and buttons with navy button text; the results hero uses a lighter blue gradient (#2B5283 to #335F96). Use cream result cards with charcoal (#292524) text, green (#2F7D5B), amber (#C77D12), and gold top bars, plus darker matching shades for emphasized amounts. Use Poppins for headings and DM Sans for body text, loaded through `next/font` without an external stylesheet. Show the BizzSimp icon beside its wordmark and the tagline “Your sales, made simple.” On the results view, place the month comparison and summary in the gradient hero, with a pill for the months and gold emphasis on key figures. Add subtle background decoration, keep text high-contrast, and use a rounded button. On devices that support hover, gently lift the result cards with a soft shadow; do not imply they are clickable, and respect reduced-motion preferences. Keep the layout compact on laptop screens and readable on phones. Avoid charts and dense tables.
+Calm and friendly, like a helpful explanation rather than a dashboard. Use a navy (#1E3A5F) page background with warm cream (#FAF8F5) text and muted blue-gray (#B8C4D6) secondary text. Use gold (#F2B84B) accents and buttons with navy button text; the results hero uses a lighter blue gradient (#2B5283 to #335F96). Use cream result cards with charcoal (#292524) text, green (#2F7D5B), amber (#C77D12), and gold top bars, plus darker matching shades for emphasized amounts. Use Poppins for headings and DM Sans for body text, loaded through `next/font` without an external stylesheet. Show the BizzSimp icon beside its wordmark and the tagline “Your sales, made simple.” On the results view, place the month comparison and summary in the gradient hero, with a pill for the months and gold emphasis on key figures. Add subtle background decoration, keep text high-contrast, and use a rounded button. On devices that support hover, gently lift the result cards with a soft shadow; do not imply they are clickable, and respect reduced-motion preferences. At 375px width, avoid horizontal scrolling or clipped content, keep visible text at least 16px, and make buttons at least 44px tall. Error and note messages use the existing palette and an icon. Keep the layout compact on laptop screens and readable on phones. Avoid charts and dense tables.
 
 ## Features and Behavior
 
@@ -36,10 +36,11 @@ Calm and friendly, like a helpful explanation rather than a dashboard. Use a nav
 
 The seller can upload a CSV in the displayed format or load the made-up sample data. Process the file in the browser; do not save it. Read the required `date`, `item`, `quantity`, and `price` headers, with dates formatted as `YYYY-MM-DD`.
 
-- If required headers are missing, remain on the upload view and identify the missing header names, while showing the expected headers again.
+- If required headers are missing, remain on the upload view and identify exactly the missing header names, while showing the expected headers and an example row again.
+- If the file is empty, is not a CSV, or cannot be read or parsed, remain on the upload view and show a clear, friendly error. Never retain or show summary results after a failed attempt; selecting another file clears the old error.
 - Ignore completely blank rows without a warning.
-- Skip rows with an invalid date, or with a missing, non-numeric, or negative quantity or price. If any rows are skipped, show a short note above the summary with the count and row numbers.
-- If no usable rows remain, stay on the upload view and explain that there is not enough usable sales data.
+- Skip rows with an invalid date, or with a missing, non-numeric, or negative quantity or price. If any rows are skipped, show a short note above the summary with the count and spreadsheet row numbers. Show at most the first 10 row numbers, followed by “and N more” when needed. Do not reject a file based on the percentage of skipped rows.
+- If no usable rows remain or fewer than two completed months are available, stay on the upload view and explain that BizzSimp needs sales from at least two full months.
 - If the usable data does not contain at least two completed calendar months to compare, stay on the upload view and explain that at least two full months of sales data are needed.
 - If the current calendar month is present, exclude it from comparisons and name it in the note, for example: “October 2026 isn’t finished yet, so it wasn’t included.”
 
@@ -50,9 +51,10 @@ Source: `scope.md > The POC Boundary`, `scope.md > What "Working" Looks Like`.
 Compare the two most recent completed calendar months represented in usable data. Show their names at the top. For each valid row, revenue is quantity multiplied by price; sum row revenue across the month and show amounts in naira.
 
 - Lead with one plain-language sentence comparing total revenue in the latest month with the previous month.
-- When the previous month had revenue and total revenue increased, state the percentage change. Name the item with the largest revenue increase only if its increase accounts for at least one third of the shop's total increase; otherwise, do not attribute the change to an item.
-- When total revenue decreased or stayed flat, state the change without naming an item.
-- When the previous month's total revenue is zero, state the latest month's earnings and explain that there is no percentage change to show.
+- When the previous month's total revenue is nonzero and the total revenue change is within 10% of that previous total (including exactly 10% up or down), say sales were steady at the latest month's total and do not name an item.
+- When the total revenue increases by more than 10%, state the percentage change. Name the item with the largest revenue increase only if its increase accounts for at least one third of the shop's total increase; otherwise, do not attribute the change to an item.
+- When total revenue decreases by more than 10%, state the change without naming an item.
+- When the previous month's total revenue is zero, say: “You earned ₦X in [month]. [Previous month] had no sales to compare with, so there's no percentage change to show.” Keep the selling card and top-seller suggestion; the slowing card says there is nothing to compare against.
 - If both months have zero revenue, do not show a summary; remain on the upload view and explain that there is not enough sales data to summarize.
 
 Source: `scope.md > The Unique Kernel`, `scope.md > What "Working" Looks Like`, `scope.md > The POC Boundary`.
@@ -61,7 +63,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > What "Working" Looks Like`, 
 
 Show up to three items in “What’s selling,” ranked by latest-month revenue. Show each item's name, revenue, and units sold, for example: “Ankara dress: ₦180,000 from 6 units.”
 
-“What’s slowing down” shows items whose revenue decreased from the previous month, including items that had no sales in the latest month, ordered by the size of the naira revenue drop, largest first. Name both months in each comparison and say plainly when an item had no sales, for example: “Silk scarf: ₦40,000 in August, no sales in September.” For a lower but nonzero result, show the revenue for both named months. If there are no slowing items, say so. When the previous month had zero total revenue, explain that there is nothing to compare against.
+“What’s slowing down” shows items whose revenue decreased by more than 10% of that item's previous-month revenue, including items that had no sales in the latest month, ordered by the size of the naira revenue drop, largest first. Name both months in each comparison and say plainly when an item had no sales, for example: “Silk scarf: ₦40,000 in August, no sales in September.” For a lower but nonzero result, show the revenue for both named months. If no item meets the threshold, say that there was no drop greater than 10% of an item's previous-month revenue. When the previous month had zero total revenue, explain that there is nothing to compare against.
 
 Show one suggestion in “What to do next.” Find the item with the largest absolute naira revenue change between the two months. If its revenue increased, suggest featuring it more; if it decreased or reached zero, suggest looking into it (for example, a discount or a fresh photo). If items tie for the largest change, choose the one with higher latest-month revenue. Never mention inventory or stock. State the figures behind the suggestion.
 

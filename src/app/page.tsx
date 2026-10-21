@@ -19,22 +19,38 @@ export default function Home() {
     const parsed = parseSalesCsv(csvText);
 
     if (parsed.kind === "missing-headers") {
-      setMessage(`This file is missing the required column${parsed.missingHeaders.length === 1 ? "" : "s"}: ${parsed.missingHeaders.join(", ")}.`);
+      const headerList =
+        parsed.missingHeaders.length === 1
+          ? parsed.missingHeaders[0]
+          : `${parsed.missingHeaders.slice(0, -1).join(", ")} and ${parsed.missingHeaders[parsed.missingHeaders.length - 1]}`;
+      setMessage(
+        `This file is missing the required column${parsed.missingHeaders.length === 1 ? "" : "s"}: ${headerList}. Expected headers: date, item, quantity, price. Example row: 2026-05-14,Ankara dress,2,30000.`,
+      );
+      return;
+    }
+
+    if (parsed.kind === "empty-file") {
+      setMessage("This file is empty. BizzSimp needs sales from at least two full months to make a useful comparison. Choose a CSV with sales data and try again.");
+      return;
+    }
+
+    if (parsed.kind === "parse-error") {
+      setMessage("We couldn't parse this file as a CSV. Check its format and try again.");
       return;
     }
 
     if (parsed.kind === "no-usable-rows") {
-      setMessage("We couldn't find usable sales rows. Check the date, item, quantity, and price in your CSV, then try again.");
+      setMessage("BizzSimp needs sales from at least two full months to make a useful comparison. Check your CSV and try again.");
       return;
     }
 
     const result = analyzeSales(parsed.rows);
     if (result.kind === "insufficient-months") {
-      setMessage("We need sales from at least two completed months to make a fair comparison. Add more monthly data and try again.");
+      setMessage("BizzSimp needs sales from at least two full months to make a useful comparison. Add more monthly data and try again.");
       return;
     }
     if (result.kind === "no-sales") {
-      setMessage("There isn't enough sales revenue in those months to make a useful summary. Check your quantities and prices, then try again.");
+      setMessage("There isn't enough sales data in those months to make a useful summary. Check your quantities and prices, then try again.");
       return;
     }
 
@@ -45,11 +61,17 @@ export default function Home() {
   }
 
   async function handleFileSelected(file: File) {
-    setIsProcessing(true);
     setMessage("");
     setAnalysis(null);
     setCopy(null);
+    setSkippedRows([]);
 
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      setMessage("That file doesn't look like a CSV. Choose a .csv file and try again.");
+      return;
+    }
+
+    setIsProcessing(true);
     try {
       summarize(await file.text());
     } catch {
@@ -63,9 +85,12 @@ export default function Home() {
     setIsProcessing(true);
     setAnalysis(null);
     setCopy(null);
+    setSkippedRows([]);
     setMessage("");
     try {
       summarize(generateSampleCsv());
+    } catch {
+      setMessage("We couldn't prepare the sample data. Please try again.");
     } finally {
       setIsProcessing(false);
     }

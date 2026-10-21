@@ -72,25 +72,25 @@ PRD ref: `prd.md > CSV upload and validation`, `prd.md > Screens and Layout`, `p
 
 ### CSV parsing and validation
 
-`src/lib/parseSalesCsv.ts` accepts CSV text, uses Papa Parse to read the fixed headers, and validates each nonblank data row. It returns either missing-header/errors or valid rows with a list of skipped source row numbers. Blank rows do not produce warnings. Any skipped rows are reported, but valid rows continue through analysis whenever at least one usable row remains; there is no unreadable-row percentage threshold. If no usable rows remain, the page shows the insufficient-data message.
+`src/lib/parseSalesCsv.ts` accepts CSV text (never a browser `File`), uses Papa Parse to read the fixed headers, and validates each nonblank data row. It returns a typed empty-file, parse-error, missing-header, no-usable-row, or success result. Blank rows do not produce warnings. Any skipped rows are reported with spreadsheet row numbers, showing at most the first 10 followed by “and N more”; valid rows continue through analysis whenever at least one usable row remains, regardless of the skipped-row percentage. An empty file, parse failure, or no usable rows stays on the upload view with a friendly message.
 
 PRD ref: `prd.md > CSV upload and validation`, `prd.md > States and Boundaries`.
 
 ### Monthly sales analysis
 
-`src/lib/analyzeSales.ts` receives validated rows and a reference date, chooses the latest two completed calendar months represented in the data, calculates row revenue as quantity times price, and computes the overall and per-item comparisons. It returns structured values rather than display sentences. Current-month rows are excluded from comparisons, and slowing items are ordered by the largest naira revenue drop first.
+`src/lib/analyzeSales.ts` receives validated rows and a reference date, chooses the latest two completed calendar months represented in the data, calculates row revenue as quantity times price, and computes the overall and per-item comparisons. It returns structured values rather than display sentences. Current-month rows are excluded from comparisons. A slowing item must have a revenue drop greater than 10% of its own previous-month revenue; qualifying items are ordered by the largest naira drop first.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`.
 
 ### Sentence writing
 
-`src/lib/salesCopy.ts` receives analysis results and creates the plain-language opening summary, item-card text, and one suggestion. Use deterministic TypeScript templates—no AI call. In the slowing card, name both compared months and use plain wording that distinguishes no latest-month sales from a lower but nonzero result. Preserve the PRD's rules: only name an item in an increasing opening summary when its revenue increase is at least one third of the total increase; use the 10% previous-month-revenue threshold for changed-item suggestions; use the top seller when the previous month's total is zero; and never infer stock or inventory.
+`src/lib/salesCopy.ts` receives analysis results and creates the plain-language opening summary, item-card text, and one suggestion. Use deterministic TypeScript templates—no AI call. In the slowing card, name both compared months and use plain wording that distinguishes no latest-month sales from a lower but nonzero result; when no item passes the 10% item-drop threshold, explain that no item had a drop greater than 10% of its own previous-month revenue. For a nonzero previous-month total, use a steady opening sentence with no item name when the total change is within 10% of that total. Preserve the PRD's other rules: only name an item in an increasing opening summary when its revenue increase is at least one third of the total increase; use the 10% previous-month-revenue threshold for changed-item suggestions; use the top seller when the previous month's total is zero; and never infer stock or inventory.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `prd.md > Non-Goals`.
 
 ### Summary view
 
-`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional note naming the unfinished current month, skipped-row notes, and the three cards: “What’s selling,” “What’s slowing down,” and “What to do next.” Its return action asks the page to clear the current result and show the upload view.
+`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional note naming the unfinished current month, skipped-row notes, and the three cards: “What’s selling,” “What’s slowing down,” and “What to do next.” The skipped-row note includes an icon, a count, and at most 10 row numbers followed by “and N more” when needed. Its return action asks the page to clear the current result and show the upload view.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `prd.md > Return to upload`, `prd.md > States and Boundaries`.
 
@@ -102,7 +102,7 @@ PRD ref: `prd.md > The Core Journey`, `prd.md > CSV upload and validation`, `prd
 
 ### Focused unit tests
 
-`src/lib/parseSalesCsv.test.ts` tests missing headers, skipped unreadable rows and their row numbers, and blank rows being ignored without a warning. `src/lib/analyzeSales.test.ts` tests selecting the latest two completed months, the zero-revenue previous-month case, the 10% steady threshold, the one-third opening-summary rule, and choosing the next-step suggestion (including the specified tie-break where useful). Run them with `npm test`. No UI tests are in scope.
+`src/lib/parseSalesCsv.test.ts` tests missing headers, invalid dates and values, skipped-row numbers, blank rows, empty input, malformed CSV, and normalized headers. `src/lib/analyzeSales.test.ts` tests choosing the latest two completed months, excluding the current month, insufficient data, zero-revenue cases, the 10% total-revenue steady headline boundary, the one-third opening-summary rule, next-step choice and tie-breaking, and per-item slowdown filtering/order above 10%. Tests pass fixed reference dates and use plain strings and arrays; no browser or UI tests are in scope. Run them with `npm test`.
 
 PRD ref: `prd.md > CSV upload and validation`, `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`.
 
@@ -111,7 +111,7 @@ PRD ref: `prd.md > CSV upload and validation`, `prd.md > Monthly summary`, `prd.
 All sales data and UI state live temporarily in browser memory:
 
 - **Validated sale:** `date` as a validated calendar date, `item` as text, and nonnegative numeric `quantity` and `price`.
-- **Parse result:** either missing required headers, no usable rows, or usable sale rows plus skipped CSV row numbers.
+- **Parse result:** empty input, parse error, missing required headers, no usable rows, or usable sale rows plus skipped CSV row numbers.
 - **Analysis result:** the previous and latest completed month identifiers/totals, overall revenue change, per-item revenue and unit totals, the ranked latest-month items, slowing items, and the values needed to choose a suggestion.
 - **Page state:** upload or summary view, current message/warnings, and current analysis result.
 
