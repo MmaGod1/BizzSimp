@@ -1,0 +1,367 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --paper: #f8f7f1;
+  --ink: #24312f;
+  --muted: #626f6b;
+  --teal: #155a52;
+  --teal-dark: #104840;
+  --line: #dce4de;
+  --white: #fffefa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible + span,
+a:focus-visible {
+  outline: 3px solid #d9a844;
+  outline-offset: 3px;
+}
+
+.page-shell {
+  width: min(100% - 2rem, 64rem);
+  margin-inline: auto;
+  padding-block: 2rem 4rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--teal);
+  font-size: 1.1rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--teal);
+  color: white;
+  font-size: 0.88rem;
+}
+
+.intro {
+  max-width: 43rem;
+  margin: clamp(3rem, 9vw, 6.5rem) auto 2rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.65rem;
+  color: var(--teal);
+  font-size: 0.84rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0.85rem;
+  font-size: clamp(2.25rem, 7vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.intro-copy {
+  max-width: 36rem;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.upload-panel {
+  max-width: 43rem;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: var(--white);
+  box-shadow: 0 1rem 3.5rem rgb(31 61 53 / 6%);
+}
+
+.drop-area {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+  padding: 1.5rem;
+  border: 2px dashed #9bb9b1;
+  border-radius: 1.1rem;
+  background: #f3f8f4;
+  color: var(--teal);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.drop-area:hover {
+  border-color: var(--teal);
+  background: #edf5f0;
+}
+
+.drop-area input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.upload-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 0.75rem;
+  place-items: center;
+  border-radius: 1rem;
+  background: #dcebe4;
+  font-size: 1.35rem;
+}
+
+.drop-title {
+  margin-bottom: 0.2rem;
+  font-weight: 750;
+}
+
+.drop-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.15rem;
+  border: 0;
+  border-radius: 0.8rem;
+  background: var(--teal);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--teal-dark);
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.button-secondary {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.button-secondary:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.format-note {
+  margin: 1.6rem 0 0;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.format-note strong {
+  color: var(--ink);
+}
+
+.example-row {
+  display: block;
+  margin-top: 0.55rem;
+  overflow-wrap: anywhere;
+  color: var(--teal);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.82rem;
+}
+
+.privacy-note {
+  margin: 1.1rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.message {
+  margin: 1rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0.8rem;
+  background: #fff3db;
+  color: #614719;
+}
+
+.summary-header {
+  max-width: 46rem;
+  margin: clamp(2.5rem, 8vw, 5rem) auto 1.5rem;
+  text-align: center;
+}
+
+.month-label {
+  margin: 0 0 0.8rem;
+  color: var(--teal);
+  font-weight: 750;
+}
+
+.lead-summary {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.035em;
+}
+
+.notice-list {
+  max-width: 46rem;
+  margin: 0 auto 1.25rem;
+}
+
+.notice {
+  margin-bottom: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.8rem;
+  background: #fff3db;
+  color: #614719;
+  font-size: 0.92rem;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.result-card {
+  min-height: 12rem;
+  padding: 1.35rem;
+  border: 1px solid transparent;
+  border-radius: 1.15rem;
+}
+
+.result-card h2 {
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.result-card p {
+  margin-bottom: 0.65rem;
+  font-size: 0.94rem;
+}
+
+.result-card p:last-child {
+  margin-bottom: 0;
+}
+
+.card-selling {
+  border-color: #cde3d4;
+  background: #edf6ee;
+}
+
+.card-slowing {
+  border-color: #ebddbb;
+  background: #fbf4e4;
+}
+
+.card-next {
+  border-color: #cee2dd;
+  background: #edf5f3;
+}
+
+.reset-row {
+  margin-top: 1.8rem;
+  text-align: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-shell {
+    width: min(100% - 1.25rem, 64rem);
+    padding-top: 1.25rem;
+  }
+
+  .upload-panel {
+    border-radius: 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

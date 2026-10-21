@@ -1,0 +1,11 @@
+devpost/learner-profile.md
+.env
+.env.*
+!.env.example
+
+# Next.js and local dependencies
+node_modules/
+.next/
+out/
+build/
+coverage/
