@@ -54,7 +54,7 @@ Browser page ──► CSV parsing and validation ──► Sales analysis
 
 Implements `prd.md > Screens and Layout` and `prd.md > Look and Feel`.
 
-Use a soft warm off-white page, charcoal text, and deep teal for headings, buttons, and the upload area. Keep generous spacing, rounded cards, and readable mobile-first sizing. Use one friendly sans-serif face with a system fallback. The opening comparison is the most prominent text; the “What’s selling” card is gently green, “What’s slowing down” warm amber rather than red, and “What to do next” teal. Keep copy calm and jargon-free, with no charts, dense tables, or dashboard styling.
+Use a navy (#1E3A5F) page with warm cream (#FAF8F5) text and muted blue-gray (#B8C4D6) secondary text. Use gold (#F2B84B) accents and gold buttons with navy text. Load Poppins for headings and DM Sans for body text through `next/font`, without an external stylesheet. Keep rounded cards and readable mobile-first sizing. On the summary view, put the month comparison in a translucent cream pill inside a lighter blue gradient hero (#2B5283 to #335F96); emphasize existing percentage and currency figures in gold. Use cream cards with charcoal (#292524) text, green (#2F7D5B), amber (#C77D12), and gold top bars, and darker card-specific amount colors for contrast. Add subtle background decoration and a pill-shaped reset button. On hover-capable devices with motion enabled, lift result cards slightly with a soft shadow; cards are not links. Preserve the header icon, BizzSimp wordmark, and “Your sales, made simple” tagline. Reduce or disable motion when requested. Keep the summary compact on laptop screens and readable at phone widths, with no charts, dense tables, or dashboard styling.
 
 ## Components
 
@@ -78,7 +78,7 @@ PRD ref: `prd.md > CSV upload and validation`, `prd.md > States and Boundaries`.
 
 ### Monthly sales analysis
 
-`src/lib/analyzeSales.ts` receives validated rows and a reference date, chooses the latest two completed calendar months represented in the data, calculates row revenue as quantity times price, and computes the overall and per-item comparisons. It returns structured values rather than display sentences. Current-month rows are excluded from comparisons.
+`src/lib/analyzeSales.ts` receives validated rows and a reference date, chooses the latest two completed calendar months represented in the data, calculates row revenue as quantity times price, and computes the overall and per-item comparisons. It returns structured values rather than display sentences. Current-month rows are excluded from comparisons, and slowing items are ordered by the largest naira revenue drop first.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`.
 
@@ -90,13 +90,13 @@ PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `pr
 
 ### Summary view
 
-`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional unfinished-month/skipped-row notes, and the three cards: “What’s selling,” “What’s slowing down,” and “What to do next.” Its return action asks the page to clear the current result and show the upload view.
+`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional note naming the unfinished current month, skipped-row notes, and the three cards: “What’s selling,” “What’s slowing down,” and “What to do next.” Its return action asks the page to clear the current result and show the upload view.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `prd.md > Return to upload`, `prd.md > States and Boundaries`.
 
 ### Sample data
 
-`src/lib/sampleCsv.ts` generates clearly fictional CSV text when “Try with sample data” is clicked. It derives dates from the browser's current date: representative rows in the two previous complete calendar months, plus a row on today in the current month. The current-month row ensures the unfinished-month note appears without introducing future-dated sample transactions. Keep the figures stable and varied enough to show three latest-month sellers, an item with previous-month sales and no latest-month sales, and an item whose revenue declines but remains nonzero, while keeping one item the clear largest mover. The generated text goes through the same parser and analysis functions as an uploaded CSV.
+`src/lib/sampleCsv.ts` generates clearly fictional CSV text when “Try with sample data” is clicked. It derives dates from the browser's current date: representative rows in the two previous complete calendar months, plus a row on today in the current month. The current-month row ensures the unfinished-month note appears without introducing future-dated sample transactions. Keep Ankara dress as the clear biggest mover, show three latest-month sellers, and include both a full drop (Silk scarf: ₦40,000 to ₦0) and a partial drop (Belts: ₦30,000 to ₦12,000). The generated text goes through the same parser and analysis functions as an uploaded CSV.
 
 PRD ref: `prd.md > The Core Journey`, `prd.md > CSV upload and validation`, `prd.md > Product Decisions`.
 
@@ -126,6 +126,7 @@ BizzSimp/
 ├── src/
 │   ├── app/
 │   │   ├── globals.css              # Tailwind setup and page color/type styling
+│   │   ├── icon.svg                 # Shared app icon and header logo
 │   │   ├── layout.tsx               # Root HTML layout and global stylesheet
 │   │   └── page.tsx                 # Client page state and upload-to-summary flow
 │   ├── components/

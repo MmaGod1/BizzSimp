@@ -28,7 +28,7 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `sco
 
 ## Look and Feel
 
-Calm and friendly, like a helpful explanation rather than a dashboard. Use a soft warm off-white background, dark charcoal text, and deep teal for the upload area, buttons, and headings. Use generous spacing, rounded cards, and large readable text that works on a phone. Use one friendly sans-serif font, such as DM Sans or Inter. Make the opening summary larger so it is the first thing the seller reads. Tint the cards gently: green for selling, warm amber (not red) for slowing down, and teal for the next step. Avoid charts, dense tables, and more than two body-text sizes.
+Calm and friendly, like a helpful explanation rather than a dashboard. Use a navy (#1E3A5F) page background with warm cream (#FAF8F5) text and muted blue-gray (#B8C4D6) secondary text. Use gold (#F2B84B) accents and buttons with navy button text; the results hero uses a lighter blue gradient (#2B5283 to #335F96). Use cream result cards with charcoal (#292524) text, green (#2F7D5B), amber (#C77D12), and gold top bars, plus darker matching shades for emphasized amounts. Use Poppins for headings and DM Sans for body text, loaded through `next/font` without an external stylesheet. Show the BizzSimp icon beside its wordmark and the tagline “Your sales, made simple.” On the results view, place the month comparison and summary in the gradient hero, with a pill for the months and gold emphasis on key figures. Add subtle background decoration, keep text high-contrast, and use a rounded button. On devices that support hover, gently lift the result cards with a soft shadow; do not imply they are clickable, and respect reduced-motion preferences. Keep the layout compact on laptop screens and readable on phones. Avoid charts and dense tables.
 
 ## Features and Behavior
 
@@ -41,7 +41,7 @@ The seller can upload a CSV in the displayed format or load the made-up sample d
 - Skip rows with an invalid date, or with a missing, non-numeric, or negative quantity or price. If any rows are skipped, show a short note above the summary with the count and row numbers.
 - If no usable rows remain, stay on the upload view and explain that there is not enough usable sales data.
 - If the usable data does not contain at least two completed calendar months to compare, stay on the upload view and explain that at least two full months of sales data are needed.
-- If the current calendar month is present, exclude it from comparisons and explain that it is unfinished.
+- If the current calendar month is present, exclude it from comparisons and name it in the note, for example: “October 2026 isn’t finished yet, so it wasn’t included.”
 
 Source: `scope.md > The POC Boundary`, `scope.md > What "Working" Looks Like`.
 
@@ -61,7 +61,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > What "Working" Looks Like`, 
 
 Show up to three items in “What’s selling,” ranked by latest-month revenue. Show each item's name, revenue, and units sold, for example: “Ankara dress: ₦180,000 from 6 units.”
 
-“What’s slowing down” shows items whose revenue decreased from the previous month, including items that had no sales in the latest month. Name both months in each comparison and say plainly when an item had no sales, for example: “Silk scarf: ₦40,000 in August, no sales in September.” For a lower but nonzero result, show the revenue for both named months. If there are no slowing items, say so. When the previous month had zero total revenue, explain that there is nothing to compare against.
+“What’s slowing down” shows items whose revenue decreased from the previous month, including items that had no sales in the latest month, ordered by the size of the naira revenue drop, largest first. Name both months in each comparison and say plainly when an item had no sales, for example: “Silk scarf: ₦40,000 in August, no sales in September.” For a lower but nonzero result, show the revenue for both named months. If there are no slowing items, say so. When the previous month had zero total revenue, explain that there is nothing to compare against.
 
 Show one suggestion in “What to do next.” Find the item with the largest absolute naira revenue change between the two months. If its revenue increased, suggest featuring it more; if it decreased or reached zero, suggest looking into it (for example, a discount or a fresh photo). If items tie for the largest change, choose the one with higher latest-month revenue. Never mention inventory or stock. State the figures behind the suggestion.
 
@@ -93,7 +93,7 @@ Source: `scope.md > The POC Boundary`, `scope.md > Explicitly Cut`.
 - Keep one simple CSV upload-and-summary flow for the six-day project; no sign-up, menus, charts, or dashboard.
 - Use a fixed CSV format with `date`, `item`, `quantity`, and `price` headers and `YYYY-MM-DD` dates. Show an example row; do not add downloads or column matching.
 - Process the file in the browser without saving it.
-- Use a made-up sample CSV with at least two complete months for the demo; do not show real customer data.
+- Use a made-up sample CSV with dates generated relative to the current date. Show three latest-month sellers, a full drop and a partial drop, and keep Ankara dress as the clear biggest mover; do not show real customer data.
 - Use ordinary code for comparisons and suggestions, with sentence writing kept separate so AI wording could be explored later. AI is out of this proof of concept because code-based results are free to run, easier to explain, and less likely to misstate numbers.
 - Use revenue as the main measure; calculate each row's revenue as quantity multiplied by price, and display amounts in naira. Show units as a supporting detail.
 - In an opening summary for an increase, name the item with the largest revenue increase only when it accounts for at least one third of the overall increase. Do not name an item in a flat or decreasing summary.

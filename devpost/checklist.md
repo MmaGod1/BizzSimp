@@ -9,7 +9,7 @@ Build mode: learn
 
 ## Slices
 
-- [ ] **1. Upload a CSV and get a plain-language sales story**
+- [x] **1. Upload a CSV and get a plain-language sales story**
   Becomes usable: A running single-page app where a seller can upload the required CSV or try fictional sample data and see a clear comparison of the two latest completed months, top sellers, slowing items, and a data-backed suggestion.
   Why now: This puts the unique kernel—the explainable, data-grounded monthly story—into the learner's hands early. Scaffolding is part of this working path, not a separate setup step.
   PRD ref: `prd.md > The Core Journey`, `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`
@@ -61,3 +61,5 @@ Reflection: [offered/answered/declined/already covered — personal answer belon
 Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
 
 ## Revisions
+
+- Refined the fictional sample before live-demo work, per learner feedback: added a third September seller and a partial decline alongside the full decline, while keeping Ankara dress the largest mover and current-month dates relative to today. Verified by the sample analysis test; slice 3 still includes deployed-demo and phone checks.

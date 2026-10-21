@@ -21,6 +21,7 @@ export type SalesAnalysisSuccess = {
   latestMonth: MonthlySales;
   revenueChange: number;
   percentageChange: number | null;
+  currentMonthLabel: string;
   itemComparisons: ItemComparison[];
   topItems: ItemComparison[];
   slowingItems: ItemComparison[];
@@ -136,11 +137,17 @@ export function analyzeSales(
     revenueChange,
     percentageChange:
       previousRevenue === 0 ? null : (revenueChange / previousRevenue) * 100,
+    currentMonthLabel: formatMonth(currentMonthId),
     itemComparisons,
     topItems: itemComparisons.filter((item) => item.latestRevenue > 0).slice(0, 3),
-    slowingItems: itemComparisons.filter(
-      (item) => item.latestRevenue < item.previousRevenue,
-    ),
+    slowingItems: itemComparisons
+      .filter((item) => item.latestRevenue < item.previousRevenue)
+      .sort(
+        (a, b) =>
+          b.previousRevenue -
+          b.latestRevenue -
+          (a.previousRevenue - a.latestRevenue),
+      ),
     hasCurrentMonthData,
   };
 }

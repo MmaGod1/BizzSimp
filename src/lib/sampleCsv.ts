@@ -22,8 +22,11 @@ export function generateSampleCsv(referenceDate = new Date()): string {
     `${dateInMonth(referenceDate, 2, 5)},Ankara dress,3,30000`,
     `${dateInMonth(referenceDate, 2, 12)},Silk scarf,4,10000`,
     `${dateInMonth(referenceDate, 2, 18)},Tote bag,2,12000`,
+    `${dateInMonth(referenceDate, 2, 20)},Belts,3,10000`,
     `${dateInMonth(referenceDate, 1, 5)},Ankara dress,6,30000`,
     `${dateInMonth(referenceDate, 1, 12)},Tote bag,2,12000`,
+    `${dateInMonth(referenceDate, 1, 18)},Belts,3,4000`,
+    `${dateInMonth(referenceDate, 1, 20)},Linen shirt,2,15000`,
     `${today},Ankara dress,1,30000`,
   ].join("\n");
 }
