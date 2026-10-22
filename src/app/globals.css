@@ -375,7 +375,8 @@ h1 {
 
 .notice-list {
   max-width: 46rem;
-  margin: 0 auto 0.85rem;
+  margin: 0 auto 2rem;
+  padding-top: 1.5rem;
 }
 
 .notice {
@@ -384,7 +385,8 @@ h1 {
   gap: 0.65rem;
   margin-bottom: 0.65rem;
   padding: 0.75rem 1rem;
-  border-left: 4px solid var(--slowing-accent);
+  border: 3px solid rgb(30 58 95 / 60%);
+  border-left: 6px solid var(--slowing-accent);
   border-radius: 0.8rem;
   background: var(--surface);
   color: var(--card-text);
@@ -406,13 +408,13 @@ h1 {
 .result-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .result-card {
   min-height: 11rem;
   padding: 1.15rem;
-  border: 1px solid transparent;
+  border: 3px solid rgb(30 58 95 / 60%);
   border-top-width: 6px;
   border-radius: 1.25rem;
   box-shadow: var(--card-resting-shadow);
@@ -517,6 +519,15 @@ h1 {
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .notice {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .notice:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow);
+  }
+
   .result-card {
     transition: transform 200ms ease, box-shadow 200ms ease;
   }
