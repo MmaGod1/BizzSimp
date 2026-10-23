@@ -17,7 +17,7 @@ Small online sellers who aren't technical and find charts, reports, and sales KP
 
 ## The Core Loop
 
-A seller uploads a sales CSV. BizzSimp compares at least two monthly periods and presents a short account of the latest period, so the seller can quickly decide what to feature or investigate.
+A seller uploads a sales CSV. BizzSimp compares at least two monthly periods and presents a short account of the latest period, so the seller can quickly decide what to feature or investigate. The seller can optionally ask AI to explain the already-calculated comparison in plain language.
 
 ## Inspiration & Identity
 
@@ -35,7 +35,7 @@ In a short demo, a seller uploads a realistic sample CSV with at least two compl
 
 - One browser-based CSV upload-and-summary flow; process the file in the browser without storing it.
 - Use a simple CSV format with `date`, `item`, `quantity`, and `price` headers, dates in `YYYY-MM-DD` format, and a displayed example row. For an unsupported file, identify missing required headers in a friendly message.
-- Compare sales and revenue across the latest two complete calendar months using ordinary code, then produce plain-language text from a separate sentence-writing step. An item is “not selling recently” if it had sales in the previous month and none in the latest month. Keep AI out of this proof of concept; the separate wording step leaves room to explore AI later.
+- Compare sales and revenue across the latest two complete calendar months using ordinary code, then produce the headline, cards, and suggestion from deterministic sentence-writing code. An item is “not selling recently” if it had sales in the previous month and none in the latest month. Offer one optional AI explanation of the completed comparison; it must not calculate or change the figures or suggestion. Only on request, send the compared month labels and totals and up to 12 item names with their monthly revenue totals to Groq through a server-side route. Never send the raw CSV or transaction-level dates, and explain this data sharing beside the action.
 - Use a made-up sample CSV containing at least two complete calendar months for the demo and video; show no real customer data.
 - Use no charts, dashboards, inventory claims, or stockout advice.
 
@@ -43,11 +43,11 @@ In a short demo, a seller uploads a realistic sample CSV with at least two compl
 
 - Column matching or broader support for store-specific CSV headers and date formats.
 - Inventory data and inventory-aware recommendations.
-- Explore AI-generated wording if templates prove too rigid.
+- Broader AI questions or AI-written recommendations.
 
 ## Explicitly Cut
 
-- AI-generated analysis or wording in this proof of concept: code-based comparisons are free to run, easier to explain, and keep statements grounded in the data.
+- AI-calculated sales analysis or AI-generated recommendations: code-based calculations and suggestions remain explainable and testable. AI is limited to an optional explanation of those existing results.
 - Charts and KPI dashboards: the core value is a brief explanation, not another report to interpret.
 - Inventory and stockout claims: sales data alone cannot establish stock levels or whether an item sold out.
 - Real customer data in the demo video: made-up sample data demonstrates the flow without exposing customer information.

@@ -7,11 +7,11 @@ status: approved
 
 ## How This Works, In Plain Language
 
-The app is one Next.js page with an upload view and a results view. When a seller chooses a CSV, the browser reads it; the file is not sent to a server or saved. Papa Parse turns the CSV text into rows, and our own TypeScript code checks those rows and compares the two latest completed months. A separate sentence-writing function turns the calculated figures into the summary and suggestion, and the page displays them in three simple cards.
+The app is one Next.js page with an upload view and a results view. When a seller chooses a CSV, the browser reads it; the file is not sent to a server or saved. Papa Parse turns the CSV text into rows, and our own TypeScript code checks those rows and compares the two latest completed months. A separate sentence-writing function turns the calculated figures into the summary and suggestion, and the page displays them in three simple cards. On request, a server-side route sends only monthly and selected item revenue aggregates to Groq for an optional plain-language explanation; the model does not calculate or change the results.
 
 The uploaded rows and results stay in the open page only. Trying sample data uses the same path as uploading a file. Starting over clears the current result; refreshing or closing the page clears the file and result too.
 
-Next.js is the framework the learner already knows and Vercel can host the demo. The app uses its browser-side features only for this proof of concept: no database, account, API route, AI service, or server-side CSV processing.
+Next.js is the framework the learner already knows and Vercel can host the demo. There is no database, user account, or server-side CSV processing. One Next.js Route Handler calls Groq only when the seller requests an explanation.
 
 ## The Core Journey Through the System
 
@@ -22,7 +22,8 @@ Implements `prd.md > The Core Journey`.
 3. The parser checks the headers and rows. It ignores blank rows, skips unreadable rows, and returns usable sales rows plus any row-number warnings. Missing headers or no usable rows return a friendly upload-view message instead.
 4. The analysis functions select the two most recent completed calendar months in the usable rows, calculate revenue and item changes, and return a typed result. If there are not two completed months, or both months have zero revenue, the page stays on the upload view with an explanation.
 5. The sentence-writing functions turn those figures into the opening comparison, result-card content, and one suggestion. The page displays the month names and, when needed, the skipped-row and unfinished-current-month notes.
-6. “Try another file” clears the in-memory file and result and returns to the upload view. Nothing is restored after a refresh or when the page is reopened.
+6. If requested, the page sends only the compared month labels and revenue totals and up to 12 item names with their monthly revenue totals to `src/app/api/explain/route.ts`. The Groq key stays on the server. The route asks Groq for a short explanation and returns the text; it does not send the CSV, transaction dates, or units.
+7. “Try another file” clears the in-memory file, result, and explanation and returns to the upload view. Nothing is restored after a refresh or when the page is reopened.
 
 ```text
 CSV file or bundled sample
@@ -32,6 +33,8 @@ Browser page ──► CSV parsing and validation ──► Sales analysis
      ▲                                              │
      │                                              ▼
      └──────────── Upload or summary view ◄── Sentence writing
+                         │
+                         └── on request: aggregate-only Groq explanation
 ```
 
 ## Stack
@@ -40,6 +43,7 @@ Browser page ──► CSV parsing and validation ──► Sales analysis
 - **TypeScript** — used for page data, parsed rows, analysis results, and sentence-writing inputs so the boundaries between modules stay reviewable.
 - **Tailwind CSS** — the learner's familiar styling tool, used for the responsive layout and the PRD's calm, warm palette.
 - **Papa Parse** — parses the fixed-format CSV in the browser. It is a small focused CSV dependency; it does not upload the file.
+- **Groq API** — optional explanation through a Next.js Route Handler using the OpenAI-compatible chat completions endpoint. The model is `openai/gpt-oss-20b`; no SDK dependency is needed. Configure the server-only `GROQ_API_KEY` in `.env.local` for local use and as a server environment variable in Vercel.
 - **Vitest** — development-only tests for the CSV parsing/validation and sales analysis modules. No UI tests.
 - **npm** — use the npm scripts created with the Next.js project. Versions are not pinned in this spec; check the current Next.js, Tailwind, Papa Parse, and Vitest setup instructions when scaffolding in the build.
 
@@ -47,7 +51,7 @@ Browser page ──► CSV parsing and validation ──► Sales analysis
 
 - **Local development:** Requires Node.js and npm compatible with the current Next.js release. In the project root, run `npm install`, then `npm run dev`, and open `http://localhost:3000`.
 - **Demo recording:** Use the local page or its Vercel deployment. Choose “Try with sample data” to demonstrate the complete flow without real customer data; also show the required CSV format and the summary. The sample data is made up.
-- **Deployment:** Deploy to Vercel, as chosen by the learner, by connecting the GitHub repository to a Vercel project and using its detected Next.js defaults. Verified 22 October 2026: the free Hobby plan includes 100 GB of Fast Data Transfer and 10 GB of Fast Origin Transfer per month, with a 45-minute build-time limit per deployment, up to 100 deployments per day, and one concurrent deployment. Hobby is restricted to personal, non-commercial use; a public demo is suitable only while it remains non-commercial and is not used for the shop's business or anyone's financial gain. Because this project is based on a client shop, confirm with Vercel support if its use or hackathon circumstances make that unclear; commercial use requires Pro or Enterprise. Sources: [Hobby plan](https://vercel.com/docs/plans/hobby), [limits](https://vercel.com/docs/limits), and [fair use guidelines](https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage). No environment variables or external API keys are needed. Verify the production build and live URL after deployment, then open the live link on a phone and confirm the fictional sample data tells the complete sales story clearly. The demo recording is prepared separately during `6-ship`.
+- **Deployment:** Deploy to Vercel, as chosen by the learner, by connecting the GitHub repository to a Vercel project and using its detected Next.js defaults. Add `GROQ_API_KEY` as a server-side environment variable (not `NEXT_PUBLIC_GROQ_API_KEY`) to enable explanations. Without it, the CSV summary still works and the explanation action reports that AI is not configured. Verified 22 October 2026: the free Hobby plan includes 100 GB of Fast Data Transfer and 10 GB of Fast Origin Transfer per month, with a 45-minute build-time limit per deployment, up to 100 deployments per day, and one concurrent deployment. Hobby is restricted to personal, non-commercial use; a public demo is suitable only while it remains non-commercial and is not used for the shop's business or anyone's financial gain. Because this project is based on a client shop, confirm with Vercel support if its use or hackathon circumstances make that unclear; commercial use requires Pro or Enterprise. Sources: [Hobby plan](https://vercel.com/docs/plans/hobby), [limits](https://vercel.com/docs/limits), and [fair use guidelines](https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage). Verify the production build and live URL after deployment, then open the live link on a phone and confirm the fictional sample data tells the complete sales story clearly. The demo recording is prepared separately during `6-ship`.
 - **Submission:** The live link is optional and supplements—not replaces—the required short demo video and public GitHub repository. The Hobby plan limits are checked in the deployment note above; if the project needs commercial use, confirm current Pro pricing before upgrading.
 
 ## Look and Feel
@@ -84,15 +88,21 @@ PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`.
 
 ### Sentence writing
 
-`src/lib/salesCopy.ts` receives analysis results and creates the plain-language opening summary, item-card text, and one suggestion. Use deterministic TypeScript templates—no AI call. In the slowing card, name both compared months and use plain wording that distinguishes no latest-month sales from a lower but nonzero result; when no item passes the 10% item-drop threshold, explain that no item had a drop greater than 10% of its own previous-month revenue. For a nonzero previous-month total, use a steady opening sentence with no item name when the total change is within 10% of that total. Preserve the PRD's other rules: only name an item in an increasing opening summary when its revenue increase is at least one third of the total increase; use the 10% previous-month-revenue threshold for changed-item suggestions; use the top seller when the previous month's total is zero; and never infer stock or inventory.
+`src/lib/salesCopy.ts` receives analysis results and creates the plain-language opening summary, item-card text, and one suggestion. Use deterministic TypeScript templates—no AI call in this module. In the slowing card, name both compared months and use plain wording that distinguishes no latest-month sales from a lower but nonzero result; when no item passes the 10% item-drop threshold, explain that no item had a drop greater than 10% of its own previous-month revenue. For a nonzero previous-month total, use a steady opening sentence with no item name when the total change is within 10% of that total. Preserve the PRD's other rules: only name an item in an increasing opening summary when its revenue increase is at least one third of the total increase; use the 10% previous-month-revenue threshold for changed-item suggestions; use the top seller when the previous month's total is zero; and never infer stock or inventory.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `prd.md > Non-Goals`.
 
 ### Summary view
 
-`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional note naming the unfinished current month, skipped-row notes, and the three cards: “What’s selling,” “What’s slowing down,” and “What to do next.” The skipped-row note includes an icon, a count, and at most 10 row numbers followed by “and N more” when needed. Its return action asks the page to clear the current result and show the upload view.
+`src/components/SummaryView.tsx` renders the compared month names, opening sentence, optional note naming the unfinished current month, skipped-row notes, the three result cards, and the optional AI explanation action and response. The page sends only the compared month and item revenue aggregates when the seller clicks the action. The skipped-row note includes an icon, a count, and at most 10 row numbers followed by “and N more” when needed. Its return action asks the page to clear the current result and show the upload view.
 
 PRD ref: `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`, `prd.md > Return to upload`, `prd.md > States and Boundaries`.
+
+### Optional AI explanation
+
+`src/lib/explanation.ts` selects the two compared month labels and revenue totals and at most 12 item names with their previous/latest month revenue totals. It omits transaction-level dates, units, and raw CSV rows. `src/app/api/explain/route.ts` validates and size-limits that payload, requires the server-only `GROQ_API_KEY`, and calls Groq's chat completions endpoint with a factual explanation prompt and bounded output. If the provider is unavailable, rate-limited, or unconfigured, the route returns an explicit error and leaves the deterministic summary intact. Do not log the input payload or key.
+
+PRD ref: `prd.md > Optional AI explanation`, `prd.md > Privacy and persistence`.
 
 ### Sample data
 
@@ -102,7 +112,7 @@ PRD ref: `prd.md > The Core Journey`, `prd.md > CSV upload and validation`, `prd
 
 ### Focused unit tests
 
-`src/lib/parseSalesCsv.test.ts` tests missing headers, invalid dates and values, skipped-row numbers, blank rows, empty input, malformed CSV, and normalized headers. `src/lib/analyzeSales.test.ts` tests choosing the latest two completed months, excluding the current month, insufficient data, zero-revenue cases, the 10% total-revenue steady headline boundary, the one-third opening-summary rule, next-step choice and tie-breaking, and per-item slowdown filtering/order above 10%. Tests pass fixed reference dates and use plain strings and arrays; no browser or UI tests are in scope. Run them with `npm test`.
+`src/lib/parseSalesCsv.test.ts` tests missing headers, invalid dates and values, skipped-row numbers, blank rows, empty input, malformed CSV, and normalized headers. `src/lib/analyzeSales.test.ts` tests choosing the latest two completed months, excluding the current month, insufficient data, zero-revenue cases, the 10% total-revenue steady headline boundary, the one-third opening-summary rule, next-step choice and tie-breaking, and per-item slowdown filtering/order above 10%. `src/lib/explanation.test.ts` checks that the request contains only bounded monthly/item revenue aggregates. `src/app/api/explain/route.test.ts` checks missing configuration, invalid input, provider request contents, and rate-limit handling. Run all tests with `npm test`.
 
 PRD ref: `prd.md > CSV upload and validation`, `prd.md > Monthly summary`, `prd.md > Result cards and suggestion`.
 
@@ -113,13 +123,14 @@ All sales data and UI state live temporarily in browser memory:
 - **Validated sale:** `date` as a validated calendar date, `item` as text, and nonnegative numeric `quantity` and `price`.
 - **Parse result:** empty input, parse error, missing required headers, no usable rows, or usable sale rows plus skipped CSV row numbers.
 - **Analysis result:** the previous and latest completed month identifiers/totals, overall revenue change, per-item revenue and unit totals, the ranked latest-month items, slowing items, and the values needed to choose a suggestion.
-- **Page state:** upload or summary view, current message/warnings, and current analysis result.
+- **Explanation request:** two month labels and revenue totals, up to 12 item names with previous/latest month revenue totals, and the count of omitted items. No CSV rows, transaction dates, or units.
+- **Page state:** upload or summary view, current message/warnings, current analysis result, and idle/loading/success/error state for the optional explanation.
 
-The fictional sample CSV is generated as a string in the browser when requested. Selecting a file reads its text in the browser; it is not posted to Vercel or another service. The parser and analysis functions return data to the page, which renders it. “Try another file” clears the current result; leaving, refreshing, or closing the page discards all uploaded data and results. No local storage, cookies for sales data, database, or saved history is used.
+The fictional sample CSV is generated as a string in the browser when requested. Selecting a file reads its text in the browser; it is not posted to Vercel or Groq. The parser and analysis functions return data to the page, which renders it. Only after the seller requests an explanation does the page send month labels and revenue totals plus up to 12 item names and their two monthly revenue totals to the server route and Groq. No transaction-level dates, units, or raw CSV rows are in that request. “Try another file” clears the current result and explanation; leaving, refreshing, or closing the page discards browser state. No local storage, cookies for sales data, database, or saved history is used.
 
 ## File Structure
 
-The repository currently contains the `devpost/` planning documents and skill files, but no Next.js application scaffold. Add the application files below while preserving those existing documents.
+The repository contains the application and the `devpost/` planning documents.
 
 ```text
 BizzSimp/
@@ -128,13 +139,19 @@ BizzSimp/
 │   │   ├── globals.css              # Tailwind setup and page color/type styling
 │   │   ├── icon.svg                 # Shared app icon and header logo
 │   │   ├── layout.tsx               # Root HTML layout and global stylesheet
-│   │   └── page.tsx                 # Client page state and upload-to-summary flow
+│   │   ├── page.tsx                 # Client page state and upload-to-summary flow
+│   │   └── api/
+│   │       └── explain/
+│   │           ├── route.ts          # Validated server-side Groq explanation endpoint
+│   │           └── route.test.ts     # Route validation and provider behavior tests
 │   ├── components/
 │   │   ├── UploadView.tsx           # Upload, sample action, instructions, messages
-│   │   └── SummaryView.tsx          # Month comparison and three result cards
+│   │   └── SummaryView.tsx          # Month comparison, cards, and optional explanation
 │   └── lib/
 │       ├── analyzeSales.ts          # Pure monthly and per-item calculations
 │       ├── analyzeSales.test.ts     # Focused sales-analysis tests
+│       ├── explanation.ts           # Aggregate-only explanation request builder
+│       ├── explanation.test.ts      # Ensures the request omits raw sales details
 │       ├── parseSalesCsv.ts         # CSV parsing and row/header validation
 │       ├── parseSalesCsv.test.ts    # Focused parser/validation tests
 │       ├── salesCopy.ts             # Deterministic user-facing sentence templates
@@ -143,6 +160,7 @@ BizzSimp/
 ├── devpost/                         # Existing planning and submission documents
 ├── package.json                     # Dependencies and dev/build/test scripts
 ├── package-lock.json                # npm dependency lockfile
+├── .env.example                     # Placeholder for the server-only Groq API key
 ├── tsconfig.json                    # TypeScript configuration
 ├── next.config.ts                   # Next.js configuration, if generated
 ├── postcss.config.mjs               # Tailwind/PostCSS configuration, if generated
@@ -151,13 +169,14 @@ BizzSimp/
 
 ## External Services and Dependencies
 
-- [Next.js documentation](https://nextjs.org/docs) — App Router and client component conventions. No Next.js API route is needed.
+- [Next.js documentation](https://nextjs.org/docs) — App Router, client components, and Route Handlers.
 - [React documentation](https://react.dev/learn) — page and component behavior.
 - [TypeScript documentation](https://www.typescriptlang.org/docs/) — typed data and pure logic modules.
 - [Tailwind CSS documentation](https://tailwindcss.com/docs) — styling. Use the version/configuration generated for the chosen Next.js setup.
 - [Papa Parse documentation](https://www.papaparse.com/docs) — parse CSV text in the browser; no endpoint, account, key, or external request.
+- [Groq API documentation](https://console.groq.com/docs/openai) — OpenAI-compatible chat completions for the optional explanation; uses the server-side `GROQ_API_KEY`. Only disclosed aggregates are sent on explicit request. Review [Groq data handling](https://console.groq.com/docs/your-data) and [rate limits](https://console.groq.com/docs/rate-limits).
 - [Vitest documentation](https://vitest.dev/guide/) — run the two pure-module test files; no external service.
-- [Vercel Next.js documentation](https://vercel.com/docs/frameworks/nextjs) — host the public demo. Vercel serves the app; the CSV is not uploaded to a Vercel function or stored there. No API calls, payloads, credentials, or rate limits are part of the app.
+- [Vercel Next.js documentation](https://vercel.com/docs/frameworks/nextjs) — host the public demo. Vercel serves the app; the CSV is not uploaded to a Vercel function or stored there. The explanation Route Handler requires `GROQ_API_KEY` configured only on the server.
 
 ## Important Failure Modes
 
@@ -165,22 +184,24 @@ BizzSimp/
 - **Some malformed rows** → skip only the unreadable rows, show their count and source row numbers, and continue with usable rows. Completely blank rows are ignored silently.
 - **No usable rows, fewer than two completed months, or both compared months have zero revenue** → stay on the upload view with the specific friendly explanation required by the PRD.
 - **File read or parse exception** → show a clear upload error and allow another file to be selected; do not silently fall back to a successful-looking result.
+- **AI key missing, provider error, timeout, or rate limit** → show a clear explanation-specific error and retry option; keep the deterministic summary and calculated figures available.
 
 ## What Was Simplified and Why
 
 - **Browser memory instead of accounts, a database, or saved reports** — the proof of concept is one upload-and-summary flow and must not retain customer data. A later product could add persistence only with an explicit privacy and product decision.
 - **Fixed CSV headers and date format instead of column matching** — keeps validation understandable and the six-day build focused.
-- **Ordinary comparisons plus deterministic sentence templates instead of AI-generated analysis or wording** — calculations remain explainable and grounded in the file, and the separate writing module can be revisited later without changing the analysis.
+- **Deterministic calculations and suggestions, with AI limited to an optional explanation** — numeric results remain explainable and testable. Only selected aggregates are sent to Groq on request; the raw CSV stays in the browser.
 - **No charts, dashboards, inventory data, or stockout advice** — these do not prove the unique kernel and sales alone cannot support inventory claims.
 - **Fictional bundled sample data instead of real customer data** — supports a complete demo while protecting the client.
 
 ## Decisions and Open Issues
 
 - **Learner choice — Next.js App Router, TypeScript, and Tailwind CSS:** use tools the learner already knows, enabling them to review generated code. The tradeoff is a little framework structure beyond a plain static page.
-- **Learner choice — client-side CSV processing with Papa Parse:** avoids sending or saving seller data and uses a small, focused parsing dependency.
-- **Learner choice — Vercel deployment:** provide a live demo link in addition to the required public GitHub repository and short video. No app secrets are needed.
-- **Learner choice — focused Vitest tests:** test parsing/validation and sales analysis modules, not the UI.
-- **Resolved uncertainty — AI-generated wording versus code-generated insights:** the approved scope chose ordinary code comparisons and a separate template-writing step because it is free to run, easier to explain, and keeps claims grounded in uploaded data. No AI is used in this POC.
+- **Learner choice — client-side CSV processing with Papa Parse:** the raw CSV is never uploaded or saved by BizzSimp.
+- **Learner choice — optional Groq explanation:** the AI call is server-side, opt-in, and limited to the compared month and item revenue aggregates. The raw CSV and transaction-level dates are excluded.
+- **Learner choice — Vercel deployment:** provide a live demo link in addition to the required public GitHub repository and short video. The server-only Groq API key is configured outside the repository.
+- **Learner choice — focused Vitest tests:** test parsing/validation, sales analysis, and explanation request/route contracts.
+- **Resolved uncertainty — AI-generated wording versus code-generated insights:** calculations, the headline, cards, and suggestion remain deterministic code. Groq is used only for the optional natural-language explanation, based on explicitly disclosed aggregates.
 - **Resolved product-rule clarification — unreadable-row threshold:** the PRD's approved behavior remains authoritative. Skip unreadable rows and continue whenever usable rows remain; show row numbers. Do not reject a file based on the percentage of unreadable rows.
 - **Implementation detail — module boundaries:** keep CSV parsing/validation, analysis, and user-facing sentence templates in separate TypeScript files so each is reviewable and the first two can be tested without the UI.
 - **Verified 22 October 2026:** the current Vercel Hobby allowances and non-commercial-use restriction are recorded under `Where It Runs and How Someone Tries It > Deployment`, with links to the official plan, limits, and fair-use documentation. For this non-commercial proof-of-concept demo, Hobby is a reasonable option only if the client shop does not use it operationally and the deployment is not for anyone's financial gain; ask Vercel support if the client or hackathon context makes that uncertain.

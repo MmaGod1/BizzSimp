@@ -34,8 +34,8 @@ Build mode: learn
   Why now: Deployment and sample-data polish belong after the local app and its recovery paths work, so the live demo showcases the finished proof of concept rather than a moving target.
   PRD ref: `prd.md > The Core Journey`, `prd.md > Result cards and suggestion`, `prd.md > Product Decisions`
   Spec ref: `spec.md > Where It Runs and How Someone Tries It`, `spec.md > Components > Sample data`, `spec.md > Decisions and Open Issues`
-  Build: Check current Vercel plan limits, deploy the app to Vercel, and refine the fictional sample to show three latest-month sellers, an item with no latest-month sales, and an item whose revenue declines but remains nonzero; keep one largest mover clear for the headline and suggestion. Polish only what is needed to make the complete story clear for the later demo recording. Keep real customer data out of the demo.
-  Verify (mechanical): Run `npm test` and `npm run build`; both must pass. Confirm Vercel reports a ready deployment and that the live URL loads the app.
+  Build: Check current Vercel plan limits, deploy the app to Vercel, and refine the fictional sample to show three latest-month sellers, an item with no latest-month sales, and an item whose revenue declines but remains nonzero; keep one largest mover clear for the headline and suggestion. Add an optional Groq explanation of the calculated comparison, with clear aggregate-only data disclosure and a server-side API key. Polish only what is needed to make the complete story clear for the later demo recording. Keep real customer data out of the demo.
+  Verify (mechanical): Run `npm test` and `npm run build`; both must pass. Confirm the explanation works with `GROQ_API_KEY` configured and the summary remains usable if the AI service is unavailable. Confirm Vercel reports a ready deployment and that the live URL loads the app.
   Learner check: Open the live link on a phone, try the sample data, and check whether the complete story is clear enough to show on camera. Share any final confusion or polish requests.
   Commit: `Prepare the live BizzSimp demo`
 
@@ -63,3 +63,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 ## Revisions
 
 - Refined the fictional sample before live-demo work, per learner feedback: added a third September seller and a partial decline alongside the full decline, while keeping Ankara dress the largest mover and current-month dates relative to today. Verified by the sample analysis test; slice 3 still includes deployed-demo and phone checks.
+- Expanded the demo scope per learner decision: add one opt-in Groq explanation based on the existing comparison, while keeping calculations, result cards, and suggestions deterministic. Send only monthly totals and up to 12 item names with monthly revenue aggregates; never send the CSV or transaction-level dates.

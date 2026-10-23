@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import type { SalesAnalysisSuccess } from "@/lib/analyzeSales";
+import { createExplanationRequest } from "@/lib/explanation";
 import type { SalesCopy } from "@/lib/salesCopy";
+
+type ExplanationState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "success"; text: string }
+  | { kind: "error"; message: string };
 
 type SummaryViewProps = {
   analysis: SalesAnalysisSuccess;
@@ -8,6 +16,10 @@ type SummaryViewProps = {
   skippedRows: number[];
   onReset: () => void;
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 function highlightHeadlineFigures(text: string) {
   return text.split(/(₦[\d,]+|\d+%)/g).map((part, index) =>
@@ -103,6 +115,75 @@ export function SummaryView({
   skippedRows,
   onReset,
 }: SummaryViewProps) {
+  const [explanation, setExplanation] = useState<ExplanationState>({
+    kind: "idle",
+  });
+
+  async function explainComparison() {
+    setExplanation({ kind: "loading" });
+
+    let response: Response;
+    try {
+      response = await fetch("/api/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(createExplanationRequest(analysis)),
+      });
+    } catch {
+      setExplanation({
+        kind: "error",
+        message: "We couldn't reach the AI service. Check your connection and try again.",
+      });
+      return;
+    }
+
+    let responseBody: unknown;
+    try {
+      responseBody = await response.json();
+    } catch {
+      setExplanation({
+        kind: "error",
+        message: "We couldn't read the AI response. Please try again.",
+      });
+      return;
+    }
+
+    if (!isRecord(responseBody)) {
+      setExplanation({
+        kind: "error",
+        message: "The AI service returned an invalid response. Please try again.",
+      });
+      return;
+    }
+
+    if (!response.ok) {
+      setExplanation({
+        kind: "error",
+        message:
+          typeof responseBody.error === "string"
+            ? responseBody.error
+            : "We couldn't explain this comparison. Please try again.",
+      });
+      return;
+    }
+
+    if (
+      typeof responseBody.explanation !== "string" ||
+      !responseBody.explanation.trim()
+    ) {
+      setExplanation({
+        kind: "error",
+        message: "The AI service returned an empty explanation. Please try again.",
+      });
+      return;
+    }
+
+    setExplanation({
+      kind: "success",
+      text: responseBody.explanation.trim(),
+    });
+  }
+
   return (
     <main className="page-shell summary-page">
       <Logo />
@@ -181,6 +262,39 @@ export function SummaryView({
           </div>
           <p>{copy.suggestion}</p>
         </article>
+      </section>
+
+      <section className="explanation-panel" aria-labelledby="explanation-title">
+        <div>
+          <h2 id="explanation-title">Need a clearer explanation?</h2>
+          <p>
+            AI receives only the two monthly totals and up to 12 item names with
+            their monthly revenue. Your CSV and transaction-level dates stay in
+            this browser.
+          </p>
+        </div>
+        <button
+          className="button"
+          type="button"
+          onClick={explainComparison}
+          disabled={explanation.kind === "loading"}
+        >
+          {explanation.kind === "loading"
+            ? "Writing an explanation…"
+            : explanation.kind === "error"
+              ? "Try explanation again"
+              : "Explain this comparison"}
+        </button>
+        {explanation.kind === "success" && (
+          <p className="explanation-result" aria-live="polite">
+            {explanation.text}
+          </p>
+        )}
+        {explanation.kind === "error" && (
+          <p className="explanation-error" role="alert">
+            {explanation.message}
+          </p>
+        )}
       </section>
 
       <div className="reset-row">

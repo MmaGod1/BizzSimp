@@ -13,7 +13,9 @@ Source: `scope.md > The Unique Kernel`, `scope.md > Who It's For`.
 1. The seller opens BizzSimp and sees a plain-language introduction, a CSV upload area, the required file format with an example row, and a note that the file is processed in the browser and not saved.
 2. The seller uploads a CSV or chooses “Try with sample data.” BizzSimp reads it immediately; there is no separate analyze button or waiting screen.
 3. If the file can be summarized, the upload view is replaced on the same page by a summary of the two most recent completed calendar months represented in the usable data. Month names appear above the summary. If the current month is present, it is excluded and a note explains that it is unfinished.
-4. The seller reads the overall revenue comparison, the three short result cards, and a suggestion based on the monthly figures. They can choose “Try another file” to return to the upload view.
+4. The seller reads the overall revenue comparison, the three short result cards, and a suggestion based on the monthly figures.
+5. If they want more context, the seller can request an optional AI explanation. Before the action, BizzSimp explains that it sends only the compared month totals and up to 12 item names with their monthly revenue totals to Groq; it never sends the raw CSV or transaction-level dates. The explanation must not change or replace calculated figures or the suggestion.
+6. The seller can choose “Try another file” to return to the upload view.
 
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `scope.md > The POC Boundary`.
 
@@ -22,7 +24,7 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `sco
 BizzSimp is a single-page experience with two views, not a multi-page flow:
 
 - **Upload view:** Calm, mostly empty layout with the headline “Turn your sales into simple advice.”, a one-line explanation, one clear upload area, and a “Try with sample data” button. Below these, show the required headers (`date`, `item`, `quantity`, `price`), the required `YYYY-MM-DD` date format, one example row, and a short browser-processing/no-storage note.
-- **Summary view:** Replace the upload view on the same page. Show the compared months at the top, then the overall one-sentence summary, followed by cards for “What’s selling,” “What’s slowing down,” and “What to do next.” Put “Try another file” at the bottom.
+- **Summary view:** Replace the upload view on the same page. Show the compared months at the top, then the overall one-sentence summary, followed by cards for “What’s selling,” “What’s slowing down,” and “What to do next.” Add an optional AI explanation action with a clear data-sharing note and space for its response. Put “Try another file” at the bottom.
 
 Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`, `scope.md > The POC Boundary`.
 
@@ -71,6 +73,12 @@ Only make that changed-item suggestion if an item's change is greater than 10% o
 
 Source: `scope.md > The Unique Kernel`, `scope.md > What "Working" Looks Like`, `scope.md > The POC Boundary`.
 
+### Optional AI explanation
+
+Keep all revenue calculations, result cards, and suggestions in deterministic application code. The seller may request one concise, plain-language explanation of the existing monthly comparison; it must use the provided results only, must not invent figures or causes, and must not make stock or inventory claims.
+
+Send the request through a server-side endpoint using a server-only `GROQ_API_KEY`. The request may contain only the two month labels and revenue totals, plus up to 12 item names with their revenue totals for both months. Do not send the uploaded CSV, transaction-level dates, units, or unrelated data. Clearly disclose the data sent to Groq next to the action. Show a loading state, an explanation on success, and a clear retryable error when the key is not configured or the service fails; keep the deterministic summary available in all cases.
+
 ### Return to upload
 
 “Try another file” returns to the upload view so the seller can start again.
@@ -85,7 +93,7 @@ Source: `scope.md > The Core Loop`.
 - **Unreadable rows:** Skip invalid rows and report their count and row numbers. Ignore entirely blank rows without reporting them.
 - **Not enough usable data:** Stay on the upload view with a friendly explanation when no usable rows remain, fewer than two completed months are available, or both compared months have zero revenue.
 - **Current month present:** Exclude the unfinished month and explain this on the summary.
-- **Privacy and persistence:** The uploaded file is processed in the browser and is not saved. The summary is available for the current page flow; no account or saved history is part of the product.
+- **Privacy and persistence:** The uploaded CSV is read in the browser and is not uploaded or stored by BizzSimp. Only when the seller requests an AI explanation, send the disclosed monthly and item revenue aggregates to Groq through the server endpoint. The raw CSV and transaction-level dates stay in the browser. Groq's own data-handling terms apply to the aggregates it receives. The app does not save sales data or provide accounts or saved history.
 - **No inventory knowledge:** Never infer stock levels, stockouts, or inventory availability from sales data.
 
 Source: `scope.md > The POC Boundary`, `scope.md > Explicitly Cut`.
@@ -96,7 +104,7 @@ Source: `scope.md > The POC Boundary`, `scope.md > Explicitly Cut`.
 - Use a fixed CSV format with `date`, `item`, `quantity`, and `price` headers and `YYYY-MM-DD` dates. Show an example row; do not add downloads or column matching.
 - Process the file in the browser without saving it.
 - Use a made-up sample CSV with dates generated relative to the current date. Show three latest-month sellers, a full drop and a partial drop, and keep Ankara dress as the clear biggest mover; do not show real customer data.
-- Use ordinary code for comparisons and suggestions, with sentence writing kept separate so AI wording could be explored later. AI is out of this proof of concept because code-based results are free to run, easier to explain, and less likely to misstate numbers.
+- Use ordinary code for comparisons and suggestions, with sentence writing kept separate. Groq may provide an optional explanation of those existing results, but it never performs or changes the calculations or suggestions.
 - Use revenue as the main measure; calculate each row's revenue as quantity multiplied by price, and display amounts in naira. Show units as a supporting detail.
 - In an opening summary for an increase, name the item with the largest revenue increase only when it accounts for at least one third of the overall increase. Do not name an item in a flat or decreasing summary.
 - Define “not selling recently” as an item that earned revenue in the previous month and none in the latest month. Never make inventory claims.
@@ -111,7 +119,8 @@ Source: `scope.md > The POC Boundary`, `scope.md > Later`, `scope.md > Explicitl
 - One responsive page with an upload view and a summary view.
 - CSV instructions with the four required headers, date format, and an example row.
 - Sample-data action using made-up sales data.
-- Browser-only processing and clear statements about not saving the file.
+- Browser-side CSV processing and clear statements that the raw file is not uploaded or stored by BizzSimp.
+- Optional Groq explanation using only disclosed monthly and item revenue aggregates; calculations and suggestions remain deterministic.
 - CSV validation and friendly missing-header, insufficient-data, and skipped-row feedback.
 - Revenue comparisons across the two most recent completed months, a one-sentence opening summary, up to three top revenue items with units, slowing/no-revenue items, and one data-backed next-step suggestion.
 - An option to return from the summary to the upload view.
@@ -124,11 +133,11 @@ Source: `scope.md > The POC Boundary`, `scope.md > Later`, `scope.md > Explicitl
 
 ## Possible Later Enhancements
 
-Broader support for store-specific CSV formats or column matching. Inventory-aware advice, if sellers can provide trustworthy stock data. AI-generated wording if the separate sentence-writing step's templates prove too rigid.
+Broader support for store-specific CSV formats or column matching. Inventory-aware advice, if sellers can provide trustworthy stock data. Broader AI questions or AI-written recommendations.
 
 ## Non-Goals
 
-- AI-generated analysis or wording: code-based analysis is free to run, explainable, and grounded in the uploaded figures.
+- AI-generated calculations or recommendations: comparisons and next-step suggestions remain code-based and explainable. AI is limited to an optional narrative explanation of those results.
 - Charts, dense tables, or KPI dashboards: the product's purpose is to explain the figures plainly.
 - Accounts, saved reports, or stored uploads: the demo is one browser-only flow.
 - Stockout or inventory claims: these cannot be established from the sales CSV.
@@ -136,4 +145,4 @@ Broader support for store-specific CSV formats or column matching. Inventory-awa
 
 ## Open Questions
 
-None blocking the product definition. Technical choices about CSV parsing and the exact implementation of the separate sentence-writing step belong in `4-spec`.
+None blocking the product definition. Technical choices about CSV parsing and the implementation of the separate sentence-writing step and optional AI explanation belong in `4-spec`.
