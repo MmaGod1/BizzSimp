@@ -18,7 +18,7 @@ Next.js is the framework the learner already knows and Vercel can host the demo.
 Implements `prd.md > The Core Journey`.
 
 1. The page shows the upload instructions, accepted headers, example row, privacy note, and sample-data button (`UploadView`).
-2. The seller picks a file or sample data. The page reads the file text in the browser and passes the text to the CSV parser.
+2. The seller picks a file or sample data. The page reads the file text in the browser and passes the text to the CSV parser. The upload instructions state that prices are assumed to be in Nigerian naira (₦), without currency detection or conversion.
 3. The parser checks the headers and rows. It ignores blank rows, skips unreadable rows, and returns usable sales rows plus any row-number warnings. Missing headers or no usable rows return a friendly upload-view message instead.
 4. The analysis functions select the two most recent completed calendar months in the usable rows, calculate revenue and item changes, and return a typed result. If there are not two completed months, or both months have zero revenue, the page stays on the upload view with an explanation.
 5. The sentence-writing functions turn those figures into the opening comparison, result-card content, and one suggestion. The page displays the month names and, when needed, the skipped-row and unfinished-current-month notes.
@@ -70,7 +70,7 @@ PRD ref: `prd.md > The Core Journey`, `prd.md > Screens and Layout`, `prd.md > S
 
 ### Upload view
 
-`src/components/UploadView.tsx` shows the headline, explanation, CSV file input, “Try with sample data” action, required headers, date format, example row, and browser-only/no-storage note. It also shows friendly file and validation errors, including missing headers and insufficient data.
+`src/components/UploadView.tsx` shows the headline, explanation, CSV file input, “Try with sample data” action, required headers, date format, example row, naira-only assumption, and browser-only/no-storage note. It also shows friendly file and validation errors, including missing headers and insufficient data.
 
 PRD ref: `prd.md > CSV upload and validation`, `prd.md > Screens and Layout`, `prd.md > States and Boundaries`.
 

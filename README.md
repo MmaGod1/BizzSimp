@@ -23,6 +23,8 @@ date,item,quantity,price
 2026-05-14,Ankara dress,2,30000
 ```
 
+Prices are assumed to be in Nigerian naira (₦); BizzSimp does not detect or convert currencies.
+
 The uploaded CSV is read in your browser and is not uploaded or stored by BizzSimp. If you request an AI explanation during local development, BizzSimp sends only the compared monthly totals and up to 12 item names with their monthly revenue totals to Groq; it does not send the CSV or transaction-level dates.
 
 **Live demo:** [bizz-simp.vercel.app](https://bizz-simp.vercel.app/)

@@ -36,7 +36,7 @@ Calm and friendly, like a helpful explanation rather than a dashboard. Use a nav
 
 ### CSV upload and validation
 
-The seller can upload a CSV in the displayed format or load the made-up sample data. Process the file in the browser; do not save it. Read the required `date`, `item`, `quantity`, and `price` headers, with dates formatted as `YYYY-MM-DD`.
+The seller can upload a CSV in the displayed format or load the made-up sample data. Process the file in the browser; do not save it. Read the required `date`, `item`, `quantity`, and `price` headers, with dates formatted as `YYYY-MM-DD`. Prices are assumed to be in Nigerian naira (₦); the app does not detect or convert currencies, and this limitation must be shown with the CSV instructions.
 
 - If required headers are missing, remain on the upload view and identify exactly the missing header names, while showing the expected headers and an example row again.
 - If the file is empty, is not a CSV, or cannot be read or parsed, remain on the upload view and show a clear, friendly error. Never retain or show summary results after a failed attempt; selecting another file clears the old error.
@@ -102,6 +102,7 @@ Source: `scope.md > The POC Boundary`, `scope.md > Explicitly Cut`.
 
 - Keep one simple CSV upload-and-summary flow for the six-day project; no sign-up, menus, charts, or dashboard.
 - Use a fixed CSV format with `date`, `item`, `quantity`, and `price` headers and `YYYY-MM-DD` dates. Show an example row; do not add downloads or column matching.
+- Assume uploaded prices are in Nigerian naira (₦), and state that the app does not detect or convert currencies.
 - Process the file in the browser without saving it.
 - Use a made-up sample CSV with dates generated relative to the current date. Show three latest-month sellers, a full drop and a partial drop, and keep Ankara dress as the clear biggest mover; do not show real customer data.
 - Use ordinary code for comparisons and suggestions, with sentence writing kept separate. Groq may provide an optional explanation of those existing results, but it never performs or changes the calculations or suggestions.

@@ -38,7 +38,7 @@ In a short demo, a seller uploads a realistic sample CSV with at least two compl
 ## The POC Boundary
 
 - One browser-based CSV upload-and-summary flow; process the file in the browser without storing it.
-- Use a simple CSV format with `date`, `item`, `quantity`, and `price` headers, dates in `YYYY-MM-DD` format, and a displayed example row. For an unsupported file, identify missing required headers in a friendly message.
+- Use a simple CSV format with `date`, `item`, `quantity`, and `price` headers, dates in `YYYY-MM-DD` format, and a displayed example row. Prices are assumed to be in Nigerian naira (₦); the app does not detect or convert currencies. For an unsupported file, identify missing required headers in a friendly message.
 - Compare sales and revenue across the latest two complete calendar months using ordinary code, then produce the headline, cards, and suggestion from deterministic sentence-writing code. An item is “not selling recently” if it had sales in the previous month and none in the latest month. In local development or a controlled demo only, offer one optional AI explanation of the completed comparison; it must not calculate or change the figures or suggestion. Only on request, send the compared month labels and totals and up to 12 item names with their monthly revenue totals to Groq through a server-side route. Never send the raw CSV or transaction-level dates, and explain this data sharing beside the action. Do not configure the Groq key in production.
 - Use a made-up sample CSV containing at least two complete calendar months for the demo and video; show no real customer data.
 - Use no charts, dashboards, inventory claims, or stockout advice.
@@ -46,6 +46,7 @@ In a short demo, a seller uploads a realistic sample CSV with at least two compl
 ## Later
 
 - Column matching or broader support for store-specific CSV headers and date formats.
+- Support other currencies through a seller-selected currency or a currency detector with confirmation; format sales summaries and AI explanations consistently in the selected currency.
 - Inventory data and inventory-aware recommendations.
 - Broader AI questions or AI-written recommendations.
 

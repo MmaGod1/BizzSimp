@@ -83,6 +83,9 @@ export function UploadView({
           <br />
           Include <code>date</code>, <code>item</code>, <code>quantity</code>,
           and <code>price</code>. Use dates in YYYY-MM-DD format.
+          <br />
+          Prices are assumed to be in Nigerian naira (₦); currencies are not
+          detected or converted.
           <code className="example-row">
             date,item,quantity,price
             <br />
