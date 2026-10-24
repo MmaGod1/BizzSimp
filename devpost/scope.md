@@ -7,6 +7,10 @@ status: approved
 
 BizzSimp turns a small online seller's sales CSV into a brief, plain-language account of what is selling, what is slowing down, and what they might do next.
 
+## Scope Update — 23 October 2026
+
+The original POC excluded AI. The learner later chose to add one narrow, optional Groq feature: explain the already-calculated comparison in plain language. This feature is for local development and controlled demos only; do not configure a Groq key in the public production deployment. The CSV summary remains fully usable without AI.
+
 ## The Unique Kernel
 
 Instead of asking sellers to interpret charts or KPIs, BizzSimp translates comparisons grounded in their sales data into clear sentences and one practical suggestion. The numbers and recommendations must be explainable from the uploaded data; the app must not claim to know inventory or stockouts.
@@ -35,7 +39,7 @@ In a short demo, a seller uploads a realistic sample CSV with at least two compl
 
 - One browser-based CSV upload-and-summary flow; process the file in the browser without storing it.
 - Use a simple CSV format with `date`, `item`, `quantity`, and `price` headers, dates in `YYYY-MM-DD` format, and a displayed example row. For an unsupported file, identify missing required headers in a friendly message.
-- Compare sales and revenue across the latest two complete calendar months using ordinary code, then produce the headline, cards, and suggestion from deterministic sentence-writing code. An item is “not selling recently” if it had sales in the previous month and none in the latest month. Offer one optional AI explanation of the completed comparison; it must not calculate or change the figures or suggestion. Only on request, send the compared month labels and totals and up to 12 item names with their monthly revenue totals to Groq through a server-side route. Never send the raw CSV or transaction-level dates, and explain this data sharing beside the action.
+- Compare sales and revenue across the latest two complete calendar months using ordinary code, then produce the headline, cards, and suggestion from deterministic sentence-writing code. An item is “not selling recently” if it had sales in the previous month and none in the latest month. In local development or a controlled demo only, offer one optional AI explanation of the completed comparison; it must not calculate or change the figures or suggestion. Only on request, send the compared month labels and totals and up to 12 item names with their monthly revenue totals to Groq through a server-side route. Never send the raw CSV or transaction-level dates, and explain this data sharing beside the action. Do not configure the Groq key in production.
 - Use a made-up sample CSV containing at least two complete calendar months for the demo and video; show no real customer data.
 - Use no charts, dashboards, inventory claims, or stockout advice.
 

@@ -12,7 +12,7 @@ npm run dev
 npm test
 ```
 
-To enable AI explanations locally, copy `.env.example` to `.env.local` and add your Groq API key. In Vercel, add `GROQ_API_KEY` as a server-side environment variable; never expose or commit the key.
+To try the optional AI explanation during local development, copy `.env.example` to `.env.local` and add your Groq API key. Do not configure the key in the public production deployment; the CSV summary works without AI. Never expose or commit the key.
 
 ## CSV format
 
@@ -23,6 +23,6 @@ date,item,quantity,price
 2026-05-14,Ankara dress,2,30000
 ```
 
-The uploaded CSV is read in your browser and is not uploaded or stored by BizzSimp. If you request an AI explanation, BizzSimp sends only the compared monthly totals and up to 12 item names with their monthly revenue totals to Groq; it does not send the CSV or transaction-level dates. Review [Groq's data handling information](https://console.groq.com/docs/your-data).
+The uploaded CSV is read in your browser and is not uploaded or stored by BizzSimp. If you request an AI explanation during local development, BizzSimp sends only the compared monthly totals and up to 12 item names with their monthly revenue totals to Groq; it does not send the CSV or transaction-level dates.
 
 **Live demo:** [bizz-simp.vercel.app](https://bizz-simp.vercel.app/)
