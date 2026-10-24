@@ -25,4 +25,4 @@ date,item,quantity,price
 
 The uploaded CSV is read in your browser and is not uploaded or stored by BizzSimp. If you request an AI explanation, BizzSimp sends only the compared monthly totals and up to 12 item names with their monthly revenue totals to Groq; it does not send the CSV or transaction-level dates. Review [Groq's data handling information](https://console.groq.com/docs/your-data).
 
-Live demo: [Add the live demo URL]
+Live demo: [https://bizz-simp.vercel.app/].
